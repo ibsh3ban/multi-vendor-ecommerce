@@ -59,7 +59,8 @@
 			  <div class="form-group mb-3">
 				<label for="inputProductDescription" class="form-label">Short Description</label>
 				<textarea name="short_descp" class="form-control" id="inputProductDescription" rows="3">
-        {{ $products->short_descp }}
+                    {{ $products->short_descp }}
+
 				</textarea>
 			  </div>
 
@@ -219,7 +220,7 @@
 
 	<div class="card-body">
 		<div class="mb-3">
-			<label for="formFile" class="form-label">Chose Thambnail Image </label>
+			<label for="formFile" class="form-label">Choose Thambnail Image </label>
 			<input name="product_thambnail" class="form-control" type="file" id="formFile">
 		</div>
 
@@ -240,6 +241,50 @@
 
 
 <!-- /// End Main Image Thambnail Update ////// -->
+<!-- /// Update Multi Image  ////// -->
+
+<div class="page-content">
+	<h6 class="mb-0 text-uppercase">Update Multi Image </h6>
+	<hr>
+<div class="card">
+<div class="card-body">
+	<table class="table mb-0 table-striped">
+		<thead>
+			<tr>
+				<th scope="col">#Sl</th>
+				<th scope="col">Image</th>
+				<th scope="col">Change Image </th>
+				<th scope="col">Action </th>
+			</tr>
+		</thead>
+		<tbody>
+
+ <form method="post" action="{{ route('update.product.multiimage') }}" enctype="multipart/form-data" >
+			@csrf
+
+	@foreach($multiImgs as $key => $img)
+	<tr>
+		<th scope="row">{{ $key+1 }}</th>
+		<td> <img src="{{ asset($img->photo_name) }}" style="width:70; height: 40px;"> </td>
+		<td> <input type="file" class="form-group" name="multi_img[{{ $img->id }}]"> </td>
+		<td>
+	<input type="submit" class="btn btn-primary px-2" value="Update Image" />
+    <a href="{{ route('product.multiimg.delete',$img->id) }}" class="btn btn-danger" id="delete" > Delete </a>
+
+		</td>
+	</tr>
+	@endforeach
+
+		</form>
+		</tbody>
+	</table>
+</div>
+</div>
+</div>
+
+
+
+<!-- /// End Update Multi Image  ////// -->
 
 
 <script type="text/javascript">
