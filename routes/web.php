@@ -1,19 +1,25 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\Backend\ActiveUserController;
 use App\Http\Controllers\User\WishlistController;
 use App\Http\Controllers\Backend\BannerController;
 use App\Http\Controllers\backend\BrandController;
 use App\Http\Controllers\backend\CategoryController;
 use App\Http\Controllers\backend\CouponController;
+use App\Http\Controllers\Backend\OrderController;
 use App\Http\Controllers\Backend\SubCategoryController;
 use App\Http\Controllers\backend\ProductController;
+use App\Http\Controllers\Backend\ReportController;
+use App\Http\Controllers\Backend\ReturnController;
 use App\Http\Controllers\backend\ShippingAreaController;
 use App\Http\Controllers\Backend\SliderController;
+use App\Http\Controllers\Backend\VendorOrderController;
 use App\Http\Controllers\Backend\VendorProductController;
 use App\Http\Controllers\Frontend\CartController;
 use App\Http\Controllers\Frontend\IndexController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\User\AllUserController;
 use App\Http\Controllers\User\CompareController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VendorController;
@@ -99,7 +105,25 @@ Route::middleware(['auth','role:vendor'])->group(function(){
     Route::get('/vendor/delete/product/{id}' , 'VendorProductDelete')->name('vendor.delete.product');
 
   });
-});  // end group middleware
+  // Brand All Route
+  Route::controller(VendorOrderController::class)->group(function(){
+    Route::get('/vendor/order' , 'VendorOrder')->name('vendor.order');
+
+    Route::get('/vendor/return/order' , 'VendorReturnOrder')->name('vendor.return.order');
+    Route::get('/vendor/complete/return/order' , 'VendorCompleteReturnOrder')->name('vendor.complete.return.order');
+    Route::get('/vendor/order/details/{order_id}' , 'VendorOrderDetails')->name('vendor.order.details');
+
+
+
+
+
+});
+
+
+
+
+
+});  // End Vendor group middleware
 
 
 
@@ -121,9 +145,8 @@ Route::middleware(['auth'])->group(function() {
     Route::post('/user/update/password', [UserController::class, 'UserUpdatePassword'])->name('user.update.password');
     }); // Gorup Milldeware End
 
-
-
 Route::middleware(['auth','role:admin'])->group(function() {
+
         // Brand All Route
        Route::controller(BrandController::class)->group(function(){
            Route::get('/all/brand' , 'AllBrand')->name('all.brand');
@@ -194,20 +217,18 @@ Route::middleware(['auth','role:admin'])->group(function() {
     Route::post('/store/slider' , 'StoreSlider')->name('store.slider');
     Route::get('/edit/slider/{id}' , 'EditSlider')->name('edit.slider');
     Route::post('/update/slider' , 'UpdateSlider')->name('update.slider');
-    Route::get('/delete/slider/{id}' , 'DeleteSlider')->name('delete.slider');
+    Route::get('/delete/slider/{id}' , 'DeleteSlider')->name('delete.slider');});
 
 
-
-  });
   // Banner All Route
-Route::controller(BannerController::class)->group(function(){
+ Route::controller(BannerController::class)->group(function(){
     Route::get('/all/banner' , 'AllBanner')->name('all.banner');
     Route::get('/add/banner' , 'AddBanner')->name('add.banner');
     Route::post('/store/banner' , 'StoreBanner')->name('store.banner');
     Route::get('/edit/banner/{id}' , 'EditBanner')->name('edit.banner');
     Route::post('/update/banner' , 'UpdateBanner')->name('update.banner');
-    Route::get('/delete/banner/{id}' , 'DeleteBanner')->name('delete.banner');
-  });
+    Route::get('/delete/banner/{id}' , 'DeleteBanner')->name('delete.banner');});
+
    // Coupon All Route
  Route::controller(CouponController::class)->group(function(){
     Route::get('/all/coupon' , 'AllCoupon')->name('all.coupon');
@@ -216,32 +237,32 @@ Route::controller(BannerController::class)->group(function(){
 
     Route::get('/edit/coupon/{id}' , 'EditCoupon')->name('edit.coupon');
     Route::post('/update/coupon' , 'UpdateCoupon')->name('update.coupon');
-    Route::get('/delete/coupon/{id}' , 'DeleteCoupon')->name('delete.coupon');
+    Route::get('/delete/coupon/{id}' , 'DeleteCoupon')->name('delete.coupon');});
 
 
- });
+
   // Shipping Division All Route
-Route::controller(ShippingAreaController::class)->group(function(){
+ Route::controller(ShippingAreaController::class)->group(function(){
     Route::get('/all/division' , 'AllDivision')->name('all.division');
     Route::get('/add/division' , 'AddDivision')->name('add.division');
     Route::post('/store/division' , 'StoreDivision')->name('store.division');
     Route::get('/edit/division/{id}' , 'EditDivision')->name('edit.division');
     Route::post('/update/division' , 'UpdateDivision')->name('update.division');
-    Route::get('/delete/division/{id}' , 'DeleteDivision')->name('delete.division');
+    Route::get('/delete/division/{id}' , 'DeleteDivision')->name('delete.division');});
 
-});
+
 // Shipping District All Route
-Route::controller(ShippingAreaController::class)->group(function(){
+ Route::controller(ShippingAreaController::class)->group(function(){
     Route::get('/all/district' , 'AllDistrict')->name('all.district');
     Route::get('/add/district' , 'AddDistrict')->name('add.district');
     Route::post('/store/district' , 'StoreDistrict')->name('store.district');
     Route::get('/edit/district/{id}' , 'EditDistrict')->name('edit.district');
     Route::post('/update/district' , 'UpdateDistrict')->name('update.district');
-    Route::get('/delete/district/{id}' , 'DeleteDistrict')->name('delete.district');
+    Route::get('/delete/district/{id}' , 'DeleteDistrict')->name('delete.district');  });
 
-});
-// Shipping State All Route
-Route::controller(ShippingAreaController::class)->group(function(){
+
+ // Shipping State All Route
+ Route::controller(ShippingAreaController::class)->group(function(){
     Route::get('/all/state' , 'AllState')->name('all.state');
     Route::get('/add/state' , 'AddState')->name('add.state');
     Route::post('/store/state' , 'StoreState')->name('store.state');
@@ -251,7 +272,60 @@ Route::controller(ShippingAreaController::class)->group(function(){
 
     Route::get('/district/ajax/{division_id}' , 'GetDistrict');
 
-});
+ });
+
+ // Admin Order All Route
+ Route::controller(OrderController::class)->group(function(){
+    Route::get('/pending/order' , 'PendingOrder')->name('pending.order');
+
+    Route::get('/admin/order/details/{order_id}' , 'AdminOrderDetails')->name('admin.order.details');
+    Route::get('/admin/confirmed/order' , 'AdminConfirmedOrder')->name('admin.confirmed.order');
+
+    Route::get('/admin/processing/order' , 'AdminProcessingOrder')->name('admin.processing.order');
+
+   Route::get('/admin/delivered/order' , 'AdminDeliveredOrder')->name('admin.delivered.order');
+   Route::get('/pending/confirm/{order_id}' , 'PendingToConfirm')->name('pending-confirm');
+   Route::get('/confirm/processing/{order_id}' , 'ConfirmToProcess')->name('confirm-processing');
+
+   Route::get('/processing/delivered/{order_id}' , 'ProcessToDelivered')->name('processing-delivered');
+   Route::get('/admin/invoice/download/{order_id}' , 'AdminInvoiceDownload')->name('admin.invoice.download');
+
+
+
+  });
+
+   // Return Order All Route
+ Route::controller(ReturnController::class)->group(function(){
+    Route::get('/return/request' , 'ReturnRequest')->name('return.request');
+    Route::get('/return/request/approved/{order_id}' , 'ReturnRequestApproved')->name('return.request.approved');
+    Route::get('/complete/return/request' , 'CompleteReturnRequest')->name('complete.return.request');
+
+
+ });
+
+ // Report All Route
+ Route::controller(ReportController::class)->group(function(){
+
+    Route::get('/report/view' , 'ReportView')->name('report.view');
+    Route::post('/search/by/date' , 'SearchByDate')->name('search-by-date');
+    Route::post('/search/by/month' , 'SearchByMonth')->name('search-by-month');
+    Route::post('/search/by/year' , 'SearchByYear')->name('search-by-year');
+
+    Route::get('/order/by/user' , 'OrderByUser')->name('order.by.user');
+    Route::post('/search/by/user' , 'SearchByUser')->name('search-by-user');
+
+
+
+    });
+    // Active user and vendor All Route
+  Route::controller(ActiveUserController::class)->group(function(){
+
+    Route::get('/all/user' , 'AllUser')->name('all-user');
+    Route::get('/all/vendor' , 'AllVendor')->name('all-vendor');
+
+
+
+  });
 
 
  }); // End Admin Middleware
@@ -352,10 +426,24 @@ Route::controller(CheckoutController::class)->group(function(){
     Route::post('/stripe/order' , 'StripeOrder')->name('stripe.order');
     Route::post('/cash/order' , 'CashOrder')->name('cash.order');
 
-
-
-
   });
+
+   // User Dashboard All Route
+ Route::controller(AllUserController::class)->group(function(){
+    Route::get('/user/account/page' , 'UserAccount')->name('user.account.page');
+    Route::get('/user/change/password' , 'UserChangePassword')->name('user.change.password');
+    Route::get('/user/order/page' , 'UserOrderPage')->name('user.order.page');
+    Route::get('/user/order_details/{order_id}' , 'UserOrderDetails');
+    Route::get('/user/invoice_download/{order_id}' , 'UserOrderInvoice');
+    Route::post('/return/order/{order_id}' , 'ReturnOrder')->name('return.order');
+    Route::get('/return/order/page' , 'ReturnOrderPage')->name('return.order.page');
+
+
+
+
+
+
+   });
 
 
 
