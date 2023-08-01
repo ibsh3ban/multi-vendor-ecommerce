@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Backend\ActiveUserController;
 use App\Http\Controllers\User\WishlistController;
 use App\Http\Controllers\Backend\BannerController;
+use App\Http\Controllers\Backend\BlogController;
 use App\Http\Controllers\backend\BrandController;
 use App\Http\Controllers\backend\CategoryController;
 use App\Http\Controllers\backend\CouponController;
@@ -13,6 +14,7 @@ use App\Http\Controllers\backend\ProductController;
 use App\Http\Controllers\Backend\ReportController;
 use App\Http\Controllers\Backend\ReturnController;
 use App\Http\Controllers\backend\ShippingAreaController;
+use App\Http\Controllers\Backend\SiteSettingController;
 use App\Http\Controllers\Backend\SliderController;
 use App\Http\Controllers\Backend\VendorOrderController;
 use App\Http\Controllers\Backend\VendorProductController;
@@ -26,6 +28,7 @@ use App\Http\Controllers\VendorController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\RedirectIfAuthenticated;
 use App\Http\Controllers\User\CheckoutController;
+use App\Http\Controllers\User\ReviewController;
 use App\Http\Controllers\User\StripeController;
 
 /*
@@ -114,10 +117,12 @@ Route::middleware(['auth','role:vendor'])->group(function(){
     Route::get('/vendor/order/details/{order_id}' , 'VendorOrderDetails')->name('vendor.order.details');
 
 
-
-
-
 });
+ Route::controller(ReviewController::class)->group(function(){
+
+    Route::get('/vendor/all/review' , 'VendorAllReview')->name('vendor.all.review');
+
+   });
 
 
 
@@ -203,6 +208,9 @@ Route::middleware(['auth','role:admin'])->group(function() {
     Route::get('/product/multiimg/delete/{id}' , 'MulitImageDelelte')->name('product.multiimg.delete');
     Route::get('/product/inactive/{id}' , 'ProductInactive')->name('product.inactive');
     Route::get('/product/active/{id}' , 'ProductActive')->name('product.active');
+
+    // For Product Stock
+    Route::get('/product/stock' , 'ProductStock')->name('product.stock');
 
 
 
@@ -323,9 +331,47 @@ Route::middleware(['auth','role:admin'])->group(function() {
     Route::get('/all/user' , 'AllUser')->name('all-user');
     Route::get('/all/vendor' , 'AllVendor')->name('all-vendor');
 
-
-
   });
+
+   // BlogPosts user and vendor All Route
+  Route::controller(BlogController::class)->group(function(){
+    Route::get('/admin/blog/category' , 'AllBlogCateogry')->name('admin.blog.category');
+    Route::get('/admin/add/blog/category' , 'AddBlogCateogry')->name('add.blog.categroy');
+    Route::post('/admin/store/blog/category' , 'StoreBlogCateogry')->name('store.blog.category');
+    Route::get('/admin/edit/blog/category/{id}' , 'EditBlogCateogry')->name('edit.blog.category');
+    Route::post('/admin/update/blog/category' , 'UpdateBlogCateogry')->name('update.blog.category');
+    Route::get('/admin/delete/blog/category/{id}' , 'DeleteBlogCateogry')->name('delete.blog.category');
+
+ });
+  // Blog Post All Route
+Route::controller(BlogController::class)->group(function(){
+
+    Route::get('/admin/blog/post' , 'AllBlogPost')->name('admin.blog.post');
+
+     Route::get('/admin/add/blog/post' , 'AddBlogPost')->name('add.blog.post');
+
+     Route::post('/admin/store/blog/post' , 'StoreBlogPost')->name('store.blog.post');
+     Route::get('/admin/edit/blog/post/{id}' , 'EditBlogPost')->name('edit.blog.post');
+
+     Route::post('/admin/update/blog/post' , 'UpdateBlogPost')->name('update.blog.post');
+
+     Route::get('/admin/delete/blog/post/{id}' , 'DeleteBlogPost')->name('delete.blog.post');
+
+
+   });
+
+   // Admin Reviw All Route
+ Route::controller(ReviewController::class)->group(function(){
+
+    Route::get('/pending/review' , 'PendingReview')->name('pending.review');
+    Route::get('/review/approve/{id}' , 'ReviewApprove')->name('review.approve');
+    Route::get('/publish/review' , 'PublishReview')->name('publish.review');
+    Route::get('/review/delete/{id}' , 'ReviewDelete')->name('review.delete');
+
+
+   });
+
+
 
 
  }); // End Admin Middleware
@@ -349,8 +395,20 @@ Route::get('/product/subcategory/{id}/{slug}', [IndexController::class, 'SubCatW
 
 // Product View Modal With Ajax
 
-
 Route::get('/product/view/modal/{id}', [IndexController::class, 'ProductViewAjax']);
+
+// Search All Route
+Route::controller(IndexController::class)->group(function(){
+
+    Route::post('/search' , 'ProductSearch')->name('product.search');
+    Route::post('/search-product' , 'SearchProduct');
+
+
+   });
+
+
+
+
 /// Add to cart store data
 Route::post('/cart/data/store/{id}', [CartController::class, 'AddToCart']);
 
@@ -383,13 +441,16 @@ Route::controller(CartController::class)->group(function(){
     Route::get('/cart-decrement/{rowId}' , 'CartDecrement');
     Route::get('/cart-increment/{rowId}' , 'CartIncrement');
 
-
-
-
-
    });
 
+   // Frontend Blog Post All Route
+ Route::controller(BlogController::class)->group(function(){
 
+    Route::get('/blog' , 'AllBlog')->name('home.blog');
+    Route::get('/post/details/{id}/{slug}' , 'BlogDetails');
+    Route::get('/post/category/{id}/{slug}' , 'BlogPostCategory');
+
+   });
 
 
 /// User All Route
@@ -413,13 +474,13 @@ Route::middleware(['auth','role:user'])->group(function() {
       });
 
       // GET dsitric and state checout All Route
-Route::controller(CheckoutController::class)->group(function(){
+ Route::controller(CheckoutController::class)->group(function(){
     Route::get('/district-get/ajax/{division_id}' , 'DistrictGetAjax');
     Route::get('/state-get/ajax/{district_id}' , 'StateGetAjax');
     Route::post('/checkout/store' , 'CheckoutStore')->name('checkout.store');
 
 
-});
+ });
 
  // Stripe CAsh All Route
  Route::controller(StripeController::class)->group(function(){
@@ -438,15 +499,42 @@ Route::controller(CheckoutController::class)->group(function(){
     Route::post('/return/order/{order_id}' , 'ReturnOrder')->name('return.order');
     Route::get('/return/order/page' , 'ReturnOrderPage')->name('return.order.page');
 
+    // Order Tracking
+  Route::get('/user/track/order' , 'UserTrackOrder')->name('user.track.order');
+  Route::post('/order/tracking' , 'OrderTracking')->name('order.tracking');
 
 
+   });
 
+   // Frontend Blog Post All Route
+ Route::controller(ReviewController::class)->group(function(){
 
+    Route::post('/store/review' , 'StoreReview')->name('store.review');
 
    });
 
 
 
+
+
 });// end group user middleware
+
+
+
+
+// Site Setting All Route
+ Route::controller(SiteSettingController::class)->group(function(){
+
+    Route::get('/site/setting' , 'SiteSetting')->name('site.setting');
+    Route::post('/site/setting/update' , 'SiteSettingUpdate')->name('site.setting.update');
+
+    Route::get('/seo/setting' , 'SeoSetting')->name('seo.setting');
+    Route::post('/seo/setting/update' , 'SeoSettingUpdate')->name('seo.setting.update');
+
+   });
+
+
+
+
 
 
